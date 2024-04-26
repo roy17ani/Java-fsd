@@ -1,136 +1,58 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>SpringHibernateWeb</groupId>
-  <artifactId>SpringHibernateWeb</artifactId>
-  <packaging>war</packaging>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>SpringHibernateWeb Maven Webapp</name>
-  <url>http://maven.apache.org</url>
-  
-    <!-- JBoss repository for Hibernate -->
-    <repositories>
-        <repository>
-            <id>JBoss repository</id>
-            <url>http://repository.jboss.org/nexus/content/groups/public/</url>
-        </repository>
-    </repositories>
-   <properties>
-    <org.springframework.version>3.0.5.RELEASE</org.springframework.version>
-  </properties>
- 
- 
-  <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>3.8.1</version>
-      <scope>test</scope>
-    </dependency>
-    
-     <dependency>
-    <groupId>org.hibernate.javax.persistence</groupId>
-    <artifactId>hibernate-jpa-2.1-api</artifactId>
-    <version>1.0.0.Final</version>
-</dependency>
+package com.ecommerce.dao;
 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
-      <version>${org.springframework.version}</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-expression</artifactId>
-      <version>${org.springframework.version}</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-beans</artifactId>
-      <version>${org.springframework.version}</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${org.springframework.version}</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context-support</artifactId>
-      <version>${org.springframework.version}</version>
-    </dependency>
-      
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-jdbc</artifactId>
-      <version>${org.springframework.version}</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-orm</artifactId>
-      <version>${org.springframework.version}</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-web</artifactId>
-      <version>${org.springframework.version}</version>
-    </dependency>
- 
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-webmvc</artifactId>
-      <version>${org.springframework.version}</version>
-    </dependency>
-     
-    <dependency>
-       <groupId>log4j</groupId>
-       <artifactId>log4j</artifactId>
-       <version>1.2.16</version>
-       <scope>runtime</scope>
-     </dependency>
-      
-    <dependency>
-        <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-core</artifactId>
-        <version>3.6.3.Final</version>
-    </dependency>
- 
-    <dependency>
-        <groupId>javassist</groupId>
-        <artifactId>javassist</artifactId>
-        <version>3.12.1.GA</version>
-    </dependency>
-  
-  
-     
-    <dependency>
-        <groupId>taglibs</groupId>
-        <artifactId>standard</artifactId>
-        <version>1.1.2</version>
-        <scope>runtime</scope>
-    </dependency>
-     
-    <dependency>
-      <groupId>commons-dbcp</groupId>
-      <artifactId>commons-dbcp</artifactId>
-      <version>1.4</version>
-    </dependency>
-         
-   <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <version>5.1.9</version>
-    </dependency>
- 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
-  </dependencies>
-  <build>
-    <finalName>SpringHibernateWeb</finalName>
-  </build>
-</project>
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+
+import com.ecommerce.EProduct;
+
+public class EProductDAO {
+
+	JdbcTemplate template;
+
+	public void setTemplate(JdbcTemplate template) {
+		this.template = template;
+	}
+
+	// Business methods
+	public List<EProduct> getProducts() {
+
+		return template.query("select * from eproduct", new RowMapper<EProduct>() {
+
+			public EProduct mapRow(ResultSet rs, int row) throws SQLException {
+				EProduct e = new EProduct();
+
+				e.setID(rs.getInt(1));
+				e.setName(rs.getString(2));
+				e.setPrice(rs.getBigDecimal(3));
+				e.setDateAdded(rs.getDate(4));
+
+				return e;
+			}
+
+		});
+
+	}
+
+	public void addProduct(String name, float price) {
+		String insertSQL = "insert into eproduct(name,price) values(?,?)";
+		template.update(insertSQL, new Object[] { name, price });
+	}
+
+	public void deleteProduct(int id) {
+		String deleteSQL = "delete from eproduct where id=?";
+		template.update(deleteSQL, new Object[] { id });
+	}
+
+	public void updateproduct(int id, String name, float price) {
+		String upadateSQL = "update eproduct set id='?'";
+		//template.update(upadateSQL, new Object[] { id,name, price });
+	
+		// TODO Auto-generated method stub
+		
+	}
+
+}
